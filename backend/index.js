@@ -2,8 +2,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const User = require("./Models/user");
 const indexRouter = require("./routes/index");
-const { route } = require("moongose/routes");
+const cors = require("cors");
 
+const router = express.Router();
+const app = express();
 app.use(cors());
 app.use(express.json())
 
@@ -18,15 +20,16 @@ main()
 async function main() {
   await mongoose.connect(`mongodb://localhost:27017/paytm`);
 }
-const app = express();
+
 
 app.get("/", (req, res) => {
-  res.send("Working in Home");
+  
+  res.json({
+    message : "Working in Home"
+  })
 });
 
-
-
-router.use("/api/v1", indexRouter);
+app.use("/api/v1", indexRouter);
 
 const port = 8080;
 app.listen(port, () => {
