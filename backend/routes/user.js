@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config");
 const zod = require("zod");
 const authMiddleware = require("../middleware");
+const Account = require("../Models/account");
 
 const router = express.Router({ mergeParams: true });
 
@@ -94,6 +95,12 @@ router.post("/signup", async (req, res) => {
   });
   const userId = user._id;
 
+  // Account Creation
+  await Account.create({
+    userId,
+    balance: 1 + Math.random() * 1000,
+  });
+
   const token = jwt.sign(
     {
       userId,
@@ -180,18 +187,16 @@ router.get("/bulk", async (req, res) => {
     $or: [
       {
         firstName: {
-          "$regex": filter,
+          $regex: filter,
         },
       },
       {
         lastName: {
-          "$regex": filter,
+          $regex: filter,
         },
       },
     ],
   });
-
-
 
   // res.json({
   //   user: users.map((user) => ({
@@ -203,9 +208,8 @@ router.get("/bulk", async (req, res) => {
   // });
 
   res.status(200).json({
-    message : users
-  })
+    message: users,
+  });
 });
-
 
 module.exports = router;
