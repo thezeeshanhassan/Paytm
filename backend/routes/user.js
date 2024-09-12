@@ -3,6 +3,8 @@ const User = require("../Models/user");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config");
 const zod = require("zod");
+const authMiddleware = require("../middleware");
+
 const router = express.Router({ mergeParams: true });
 
 const signupSchema = zod.object({
@@ -20,46 +22,94 @@ const signinSchema = zod.object({
 const changeDetailSchema = zod.object({
   firstName: zod.string().optional(),
   lastName: zod.string().optional(),
+  password: zod.string().optional(),
 });
 
+//   const { username, firstName, lastName, password } = req.body;
+
+//   // Validate request body
+//   const { success, error } = signupSchema.safeParse(req.body);
+//   if (!success) {
+//     return res.status(400).json({
+//       message: "Input Fields are Incorrect",
+//     });
+//   }
+
+//   // Check if the user already exists
+//   const user = await User.findOne({ username });
+//   if (user) {
+//     return res.status(409).json({
+//       message: "Username Already Exists",
+//     });
+//   }
+
+//   // Create the new user
+//   const newUser = new User({
+//     username: username,
+//     firstName: firstName,
+//     lastName: lastName,
+//     password: password,
+//   });
+
+//   const savedUser = await newUser.save();
+//   console.log(savedUser._id);
+//   const userId = savedUser._id;
+//   const token = jwt.sign(
+//     {
+//       userId,
+//     },
+//     JWT_SECRET
+//   );
+
+//   // Send success response with the token
+//   res.status(201).json({
+//     message: "User Created Successfully",
+//     token: token,
+//   });
+// });
+
 router.post("/signup", async (req, res) => {
-  const { username, firstName, lastName, password } = req.body;
-
-  // Validate request body
-  const { success, error } = signupSchema.safeParse(req.body);
+  const { success } = signupSchema.safeParse(req.body);
   if (!success) {
-    return res.status(400).json({
-      message: "Input Fields are Incorrect",
+    return res.status(411).json({
+      message: "Email already taken / Incorrect inputs",
     });
   }
 
-  // Check if the user already exists
-  const user = await User.findOne({ username });
-  if (user) {
-    return res.status(409).json({
-      message: "Username Already Exists",
-    });
-  }
-
-  // Create the new user
-  const newUser = new User({
-    username: username,
-    firstName: firstName,
-    lastName: lastName,
-    password: password,
+  const existingUser = await User.findOne({
+    username: req.body.username,
   });
 
-  await newUser.save();
+  if (existingUser) {
+    return res.status(411).json({
+      message: "Email already taken/Incorrect inputs",
+    });
+  }
 
-  // Create JWT token with expiration time (optional)
-  const token = jwt.sign({ userId: newUser._id }, 
-    JWT_SECRET);
+  const user = await User.create({
+    username: req.body.username,
+    password: req.body.password,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+  });
+  const userId = user._id;
 
-  // Send success response with the token
-  res.status(201).json({
-    message: "User Created Successfully",
+  const token = jwt.sign(
+    {
+      userId,
+    },
+    JWT_SECRET
+  );
+
+  res.json({
+    message: "User created successfully",
     token: token,
   });
+});
+
+const signinBody = zod.object({
+  username: zod.string(),
+  password: zod.string(),
 });
 
 router.post("/signin", async (req, res) => {
@@ -88,6 +138,7 @@ router.post("/signin", async (req, res) => {
   }
 
   const userId = user._id;
+
   const token = jwt.sign(
     {
       userId,
@@ -101,8 +152,7 @@ router.post("/signin", async (req, res) => {
   });
 });
 
-router.post("/update", async (req, res) => {
-  const { firstName, lastName } = req.body;
+router.put("/update", authMiddleware, async (req, res) => {
   const { success } = changeDetailSchema.safeParse(req.body);
 
   if (!success) {
@@ -111,30 +161,51 @@ router.post("/update", async (req, res) => {
     });
   }
 
-  const userId = req.userId;
-  const token = jwt.sign(
+  const user = await User.findOneAndUpdate(
     {
-      userId,
+      _id: req.userId,
     },
-    JWT_SECRET
+    req.body,
+    { new: true }
   );
-
-  const provideToken = req.headers["authorization"];
-   if (provideToken != token) {
-    res.status(400).json({
-      message: "Please Provide Token",
-    });
-  }
-
-
-  const updateduser = await User.updateOne({userId});
-
- 
-
   res.status(200).json({
-    message: "User Created Successfully",
-    token: token,
+    message: "User Updated Successfully",
   });
 });
+
+router.get("/bulk", async (req, res) => {
+  const filter = req.query.filter || "";
+
+  const users = await User.find({
+    $or: [
+      {
+        firstName: {
+          "$regex": filter,
+        },
+      },
+      {
+        lastName: {
+          "$regex": filter,
+        },
+      },
+    ],
+  });
+
+
+
+  // res.json({
+  //   user: users.map((user) => ({
+  //     username: user.username,
+  //     firstName: user.firstName,
+  //     lastName: user.lastName,
+  //     _id: user._id,
+  //   })),
+  // });
+
+  res.status(200).json({
+    message : users
+  })
+});
+
 
 module.exports = router;
