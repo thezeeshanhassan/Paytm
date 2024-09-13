@@ -7,7 +7,7 @@ const cors = require("cors");
 const router = express.Router();
 const app = express();
 app.use(cors());
-app.use(express.json())
+app.use(express.json());
 
 main()
   .then(() => {
@@ -21,12 +21,10 @@ async function main() {
   await mongoose.connect(`mongodb://localhost:27017/paytm`);
 }
 
-
 app.get("/", (req, res) => {
-  
   res.json({
-    message : "Working in Home"
-  })
+    message: "Working in Home",
+  });
 });
 
 app.use("/api/v1", indexRouter);
@@ -35,9 +33,6 @@ const port = 8080;
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
-
-
-
 
 // app.get("/adduser", async (req, res) => {
 //   const user = new User({

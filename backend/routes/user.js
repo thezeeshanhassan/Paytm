@@ -26,54 +26,11 @@ const changeDetailSchema = zod.object({
   password: zod.string().optional(),
 });
 
-//   const { username, firstName, lastName, password } = req.body;
-
-//   // Validate request body
-//   const { success, error } = signupSchema.safeParse(req.body);
-//   if (!success) {
-//     return res.status(400).json({
-//       message: "Input Fields are Incorrect",
-//     });
-//   }
-
-//   // Check if the user already exists
-//   const user = await User.findOne({ username });
-//   if (user) {
-//     return res.status(409).json({
-//       message: "Username Already Exists",
-//     });
-//   }
-
-//   // Create the new user
-//   const newUser = new User({
-//     username: username,
-//     firstName: firstName,
-//     lastName: lastName,
-//     password: password,
-//   });
-
-//   const savedUser = await newUser.save();
-//   console.log(savedUser._id);
-//   const userId = savedUser._id;
-//   const token = jwt.sign(
-//     {
-//       userId,
-//     },
-//     JWT_SECRET
-//   );
-
-//   // Send success response with the token
-//   res.status(201).json({
-//     message: "User Created Successfully",
-//     token: token,
-//   });
-// });
-
 router.post("/signup", async (req, res) => {
   const { success } = signupSchema.safeParse(req.body);
   if (!success) {
     return res.status(411).json({
-      message: "Email already taken / Incorrect inputs",
+      message: "Incorrect inputs",
     });
   }
 
@@ -83,7 +40,7 @@ router.post("/signup", async (req, res) => {
 
   if (existingUser) {
     return res.status(411).json({
-      message: "Email already taken/Incorrect inputs",
+      message: "User already taken/Incorrect inputs",
     });
   }
 
@@ -96,10 +53,13 @@ router.post("/signup", async (req, res) => {
   const userId = user._id;
 
   // Account Creation
-  await Account.create({
+  const initialBalance = 1 + Math.random() * 1000;
+  const account = new Account({
     userId,
-    balance: 1 + Math.random() * 1000,
+    balance: initialBalance,
   });
+  
+  await account.save();
 
   const token = jwt.sign(
     {
