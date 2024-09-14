@@ -12,7 +12,8 @@ export const Users = () => {
     axios
       .get("http://localhost:8000/api/v1/user/bulk?filter=" + filter)
       .then((response) => {
-        setUsers(response.data.message);
+        console.log(response.data);
+        setUsers(response.data.user);
       });
   }, [filter]);
 
@@ -46,9 +47,8 @@ function User({ user }) {
   return (
     <div className="flex justify-between">
       <div className="flex">
-        {/* rounded-full h-12 w-12 bg-slate-200 flex justify-center mt-2 mr-2 mb-2  */}
-        <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mt-2 mr-2 mb-2">
-          <div className="flex flex-col justify-center  h-full text-xl text-white">
+        <div className="rounded-full h-12 w-12 bg-slate-200 flex justify-center mt-2 mr-2 mb-2">
+          <div className="flex flex-col justify-center  h-full text-xl">
             {user.firstName[0]}
           </div>
         </div>
@@ -62,7 +62,7 @@ function User({ user }) {
       <div className="flex flex-col justify-center h-ful">
         <Button
           onClick={(e) => {
-            navigate("/send?id=" + user._id + "&name=" + user.firstName);
+            navigate("/sendmoney?id=" + user._id + "&name=" + user.firstName +" " + user.lastName);
           }}
           label={"Send Money"}
         />

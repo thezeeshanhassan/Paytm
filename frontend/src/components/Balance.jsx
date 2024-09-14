@@ -25,7 +25,6 @@ export const Balance = () => {
         },
       }
     );
-    console.log(response.data.balance);
     setBalance(response.data.balance);
   }
   checkBalance();

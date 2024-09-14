@@ -8,7 +8,7 @@ import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 
 export const Signin = () => {
-  const [userName, setUserName] = useState("");
+  const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
@@ -39,12 +39,12 @@ export const Signin = () => {
                 let response = await axios.post(
                   "http://localhost:8000/api/v1/user/signin",
                   {
-                    userName,
+                    username,
                     password,
                   }
                 );
-
-                localStorage.setItem("token", response.data.token);
+                console.log(response);
+                window.localStorage.setItem("token", response.data.token);
                 navigate("/dashboard");
               }}
             />
