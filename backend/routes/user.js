@@ -75,7 +75,6 @@ router.post("/signup", async (req, res) => {
 });
 
 router.post("/signin", async (req, res) => {
-  console.log("Inside Signin")
   const { success } = signinSchema.safeParse(req.body);
   if (!success) {
     return res.status(411).json({
