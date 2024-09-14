@@ -158,17 +158,13 @@ router.get("/bulk", async (req, res) => {
     ],
   });
 
-  // res.json({
-  //   user: users.map((user) => ({
-  //     username: user.username,
-  //     firstName: user.firstName,
-  //     lastName: user.lastName,
-  //     _id: user._id,
-  //   })),
-  // });
-
-  res.status(200).json({
-    message: users,
+  res.json({
+    user: users.map((user) => ({
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      _id: user._id,
+    })),
   });
 });
 
