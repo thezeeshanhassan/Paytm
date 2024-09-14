@@ -74,12 +74,8 @@ router.post("/signup", async (req, res) => {
   });
 });
 
-const signinBody = zod.object({
-  username: zod.string(),
-  password: zod.string(),
-});
-
 router.post("/signin", async (req, res) => {
+  console.log("Inside Signin")
   const { success } = signinSchema.safeParse(req.body);
   if (!success) {
     return res.status(411).json({
