@@ -58,7 +58,7 @@ router.post("/signup", async (req, res) => {
     userId,
     balance: initialBalance,
   });
-  
+
   await account.save();
 
   const token = jwt.sign(
@@ -160,6 +160,20 @@ router.get("/bulk", async (req, res) => {
       lastName: user.lastName,
       _id: user._id,
     })),
+  });
+});
+
+router.get("/profile", authMiddleware, async (req, res) => {
+  const user = await User.findOne({ _id: req.userId });
+
+  if (!user) {
+    return res.status(404).json({
+      message: "User Not Found",
+    });
+  }
+
+  res.status(200).json({
+    user: user,
   });
 });
 
