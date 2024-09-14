@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 export const Users = () => {
   // Replace with backend call
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
 
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/v1/user/bulk?filter=" + filter)
       .then((response) => {
-        console.log(response.data);
         setUsers(response.data.user);
       });
   }, [filter]);
@@ -32,7 +34,12 @@ export const Users = () => {
       </div>
       <div>
         {Array.isArray(users) && users.length > 0 ? (
-          users.map((user) => <User key={user._id} user={user} />)
+          users.map(
+            (user) =>
+              user._id !== id ? ( // Check if the user's _id is not equal to user_id
+                <User key={user._id} user={user} /> // Pass user data as props
+              ) : null // Return null if the user's _id matches user_id
+          )
         ) : (
           <div>No users found.</div>
         )}
@@ -62,7 +69,14 @@ function User({ user }) {
       <div className="flex flex-col justify-center h-ful">
         <Button
           onClick={(e) => {
-            navigate("/sendmoney?id=" + user._id + "&name=" + user.firstName +" " + user.lastName);
+            navigate(
+              "/sendmoney?id=" +
+                user._id +
+                "&name=" +
+                user.firstName +
+                " " +
+                user.lastName
+            );
           }}
           label={"Send Money"}
         />

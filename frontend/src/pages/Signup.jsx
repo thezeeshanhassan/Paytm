@@ -14,6 +14,19 @@ export const Signup = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  async function gettingUser(token) {
+    let response = await axios.get(
+      "http://localhost:8000/api/v1/user/profile",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const existingUser = response.data.user;
+    return existingUser;
+  }
+
   return (
     <div className="bg-slate-300 h-screen flex justify-center">
       <div className="flex flex-col justify-center">
@@ -41,7 +54,6 @@ export const Signup = () => {
             placeholder="Doe"
             label={"Last Name"}
           />
-          
           <InputBox
             onChange={(e) => {
               setPassword(e.target.value);
@@ -62,7 +74,8 @@ export const Signup = () => {
                   }
                 );
                 window.localStorage.setItem("token", response.data.token);
-                navigate("/dashboard");
+                let user = await gettingUser(response.data.token);
+                navigate("/dashboard?id=" + user._id);
               }}
               label={"Sign up"}
             />
