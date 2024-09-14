@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "moongose": "^1.0.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.4"
-  }
-}

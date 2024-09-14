@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1", indexRouter);
 
-const port = 8080;
+const port = 8000;
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
