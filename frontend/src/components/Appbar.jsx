@@ -18,9 +18,8 @@ export const Appbar = () => {
       const userName = response.data.user.firstName;
       setName(userName);
     }
-    gettingUser(token); // Call the async function inside useEffect
-  }, [token]); // Dependency array is fixed, now properly placed
-
+    gettingUser(token); 
+  }, [token]); 
   return (
     <div className="shadow h-14 flex justify-between">
       <div className="flex flex-col justify-center h-full ml-4">PayTM App</div>
